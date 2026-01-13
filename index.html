@@ -1,0 +1,482 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Homebuyer Quest: South Florida Edition</title>
+  <style>
+    :root { --r: 18px; }
+    body{
+      margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: linear-gradient(180deg,#0b2a4a,#0a5aa6 60%, #0b2a4a);
+      color:#fff; min-height:100vh; display:flex; align-items:center; justify-content:center;
+      padding:18px;
+    }
+    .app{
+      width:min(920px, 100%);
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: calc(var(--r) + 10px);
+      box-shadow: 0 20px 60px rgba(0,0,0,.35);
+      overflow:hidden;
+      backdrop-filter: blur(10px);
+    }
+    header{
+      padding:18px 18px 12px;
+      display:flex; gap:12px; flex-wrap:wrap; align-items:center; justify-content:space-between;
+      background: rgba(0,0,0,.20);
+      border-bottom: 1px solid rgba(255,255,255,.12);
+    }
+    .brand{
+      display:flex; gap:12px; align-items:center;
+    }
+    .badge{
+      width:44px; height:44px; border-radius: 14px;
+      background: radial-gradient(circle at 30% 20%, #ffd66e, #ff7a00 55%, #ff2f6d);
+      display:grid; place-items:center; font-size:22px; font-weight:900;
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+    }
+    h1{ font-size:18px; margin:0; letter-spacing:.2px; }
+    .sub{ margin:2px 0 0; opacity:.9; font-size:13px; }
+    .meta{
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+      font-size:13px;
+    }
+    .pill{
+      background: rgba(255,255,255,.10);
+      border: 1px solid rgba(255,255,255,.16);
+      padding:8px 10px; border-radius: 999px;
+      display:flex; gap:8px; align-items:center;
+    }
+    .dot{ width:8px; height:8px; border-radius:50%; background:#7CFFB2; box-shadow:0 0 0 4px rgba(124,255,178,.18); }
+    .wrap{ padding:18px; display:grid; gap:16px; grid-template-columns: 1.2fr .8fr; }
+    @media (max-width: 860px){ .wrap{ grid-template-columns: 1fr; } }
+    .card{
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: var(--r);
+      padding:16px;
+    }
+    .question{
+      font-size:18px; margin:0 0 12px; line-height:1.35;
+    }
+    .choices{ display:grid; gap:10px; }
+    button.choice{
+      text-align:left;
+      background: rgba(0,0,0,.18);
+      border: 1px solid rgba(255,255,255,.16);
+      color:#fff;
+      padding:12px 12px;
+      border-radius: 14px;
+      cursor:pointer;
+      transition: transform .06s ease, background .2s ease, border .2s ease;
+      display:flex; gap:10px; align-items:flex-start;
+    }
+    button.choice:hover{ background: rgba(255,255,255,.10); }
+    button.choice:active{ transform: translateY(1px); }
+    .tag{
+      font-size:12px; opacity:.9;
+      background: rgba(255,255,255,.10);
+      border: 1px solid rgba(255,255,255,.14);
+      padding:2px 8px; border-radius: 999px; white-space:nowrap;
+    }
+    .desc{ font-size:13px; opacity:.95; margin-top:4px; }
+    .side h2{ margin:0 0 10px; font-size:14px; letter-spacing:.3px; opacity:.95; }
+    .statline{ display:flex; gap:10px; flex-wrap:wrap; }
+    .stat{
+      flex:1; min-width: 160px;
+      background: rgba(0,0,0,.18);
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 14px;
+      padding:10px;
+    }
+    .stat .k{ font-size:12px; opacity:.85; }
+    .stat .v{ font-size:18px; font-weight:800; margin-top:2px; }
+    .progress{
+      height:10px; border-radius: 999px; overflow:hidden;
+      background: rgba(255,255,255,.10);
+      border: 1px solid rgba(255,255,255,.14);
+      margin-top:10px;
+    }
+    .bar{ height:100%; width:0%; background: linear-gradient(90deg,#7CFFB2,#ffd66e,#ff7a00); transition: width .25s ease; }
+    .note{
+      margin-top:12px; font-size:13px; opacity:.95; line-height:1.4;
+      padding:10px; border-radius: 14px;
+      background: rgba(255,255,255,.06);
+      border: 1px dashed rgba(255,255,255,.18);
+    }
+    .actions{ display:flex; gap:10px; flex-wrap:wrap; margin-top:12px; }
+    .btn{
+      background: #ffffff;
+      color:#0b2a4a;
+      border: 0;
+      padding:10px 12px;
+      border-radius: 12px;
+      cursor:pointer;
+      font-weight:800;
+    }
+    .btn.secondary{
+      background: rgba(255,255,255,.10);
+      border: 1px solid rgba(255,255,255,.18);
+      color:#fff;
+      font-weight:700;
+    }
+    .footer{
+      padding:14px 18px 18px;
+      border-top: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.16);
+      display:flex; gap:10px; flex-wrap:wrap; justify-content:space-between; align-items:center;
+      font-size:12px; opacity:.92;
+    }
+    a{ color:#ffd66e; text-decoration:none; }
+    .toast{
+      position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
+      background: rgba(0,0,0,.72); border: 1px solid rgba(255,255,255,.16);
+      padding:10px 12px; border-radius: 12px; font-size:13px; opacity:0;
+      transition: opacity .2s ease;
+      pointer-events:none;
+    }
+    .toast.show{ opacity:1; }
+  </style>
+</head>
+<body>
+  <div class="app" role="application" aria-label="Homebuyer Quest Game">
+    <header>
+      <div class="brand">
+        <div class="badge">🏡</div>
+        <div>
+          <h1>Homebuyer Quest: South Florida Edition</h1>
+          <div class="sub">Pick your choices • earn points • see your buyer profile</div>
+        </div>
+      </div>
+      <div class="meta">
+        <div class="pill"><span class="dot"></span><span id="statusText">Ready</span></div>
+        <div class="pill">👤 <strong>Shari Dickerson</strong> • Florida Realtor • eXp Realty</div>
+      </div>
+    </header>
+
+    <div class="wrap">
+      <main class="card" id="mainCard">
+        <p class="question" id="questionText"></p>
+        <div class="choices" id="choices"></div>
+        <div class="actions" id="midActions" style="display:none;">
+          <button class="btn secondary" id="backBtn">← Back</button>
+          <button class="btn" id="nextBtn">Next →</button>
+        </div>
+      </main>
+
+      <aside class="card side">
+        <h2>YOUR STATS</h2>
+        <div class="statline">
+          <div class="stat">
+            <div class="k">Score</div>
+            <div class="v" id="scoreText">0</div>
+          </div>
+          <div class="stat">
+            <div class="k">Progress</div>
+            <div class="v"><span id="stepText">0</span>/<span id="totalText">0</span></div>
+          </div>
+        </div>
+
+        <div class="progress" aria-label="progress bar"><div class="bar" id="bar"></div></div>
+
+        <div class="note" id="tipBox">
+          Tip: Tap the choice that feels most like you. There’s no “perfect” answer—this game helps you think like a smart buyer.
+        </div>
+
+        <div class="actions">
+          <button class="btn secondary" id="restartBtn">Restart</button>
+          <button class="btn secondary" id="copyBtn">Copy My Result</button>
+        </div>
+
+        <div class="note" id="ctaBox">
+          Want a real plan (budget → neighborhoods → keys)?<br>
+          Text/Call <strong>954-204-5926</strong>
+        </div>
+      </aside>
+    </div>
+
+    <div class="footer">
+      <div>© <span id="year"></span> • Mini-game for social posts • Works on mobile + desktop</div>
+      <div>Made for Facebook sharing • <a href="#" id="shareLink">How to post</a></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">Copied!</div>
+
+  <script>
+    // --- Game content (edit anytime) ---
+    const GAME = {
+      title: "Homebuyer Quest: South Florida Edition",
+      questions: [
+        {
+          q: "1) You just got pre-approved. What’s your first move?",
+          tip: "A strong plan beats random scrolling every time.",
+          choices: [
+            { t:"Set a realistic monthly payment target + reserves", tag:"+Smart", pts: 20, profile:{planner:2} },
+            { t:"Tour homes ASAP to “get a feel” first", tag:"+Fast", pts: 12, profile:{fast:2} },
+            { t:"Wait until rates drop a lot more", tag:"+Patient", pts: 8,  profile:{patient:2} }
+          ]
+        },
+        {
+          q: "2) You find a home you love… but it needs updates. You…",
+          tip: "Renovations can be a win if you budget and negotiate.",
+          choices: [
+            { t:"Ask for seller credits or price reduction to offset repairs", tag:"+Negotiator", pts: 18, profile:{negotiator:2} },
+            { t:"Walk away—only move-in ready", tag:"+Selective", pts: 12, profile:{selective:2} },
+            { t:"Buy it and DIY later without budgeting", tag:"+Risk", pts: 6, profile:{risk:2} }
+          ]
+        },
+        {
+          q: "3) In South Florida, you’re deciding between location vs. space. You choose…",
+          tip: "Your priorities drive the best decision—there’s no one-size-fits-all.",
+          choices: [
+            { t:"Location (schools, commute, beach access) even if smaller", tag:"+Lifestyle", pts: 16, profile:{lifestyle:2} },
+            { t:"More space/yard even if farther out", tag:"+Space", pts: 14, profile:{space:2} },
+            { t:"Best deal only—wherever it is", tag:"+Deal", pts: 15, profile:{deal:2} }
+          ]
+        },
+        {
+          q: "4) Your offer strategy in today’s market is…",
+          tip: "The best offer isn’t always the highest—it’s the cleanest.",
+          choices: [
+            { t:"Strong price + clean terms (short inspection, solid lender)", tag:"+Strong", pts: 18, profile:{planner:1, negotiator:1} },
+            { t:"Low offer first and see what happens", tag:"+Bold", pts: 12, profile:{deal:2} },
+            { t:"Ask for everything (credits, repairs, long closing)", tag:"+Heavy", pts: 8, profile:{patient:1} }
+          ]
+        },
+        {
+          q: "5) You’re about to close. What do you do next?",
+          tip: "Avoid new debt and keep your paperwork tight until keys-in-hand.",
+          choices: [
+            { t:"Stay financially steady + respond fast to lender requests", tag:"+Closer", pts: 20, profile:{planner:2} },
+            { t:"Buy furniture on credit because it’s on sale", tag:"+Oops", pts: 4, profile:{risk:2} },
+            { t:"Ghost your lender for 3 days and hope it works out", tag:"+Chaos", pts: 1, profile:{risk:3} }
+          ]
+        }
+      ],
+      profiles: [
+        {
+          name:"The Power Planner 🧠🏡",
+          rule: p => (p.planner||0) >= 4,
+          msg:"You make moves with a plan: budget, strategy, and fast follow-through. You’re the buyer that wins offers with confidence."
+        },
+        {
+          name:"The Deal Hunter 💰🔍",
+          rule: p => (p.deal||0) >= 4,
+          msg:"You love value—price, terms, and negotiating room. With the right comps and strategy, you can score a smart buy."
+        },
+        {
+          name:"The Lifestyle Chooser 🌴✨",
+          rule: p => (p.lifestyle||0) >= 3,
+          msg:"You’re buying a life, not just a house. Location and daily joy matter—your best home fits how you live."
+        },
+        {
+          name:"The Fast Mover ⚡🏠",
+          rule: p => (p.fast||0) >= 3,
+          msg:"When you’re ready, you’re READY. Speed is your advantage—pair it with clean terms and you’ll land the home."
+        },
+        {
+          name:"The Patient Waiter ⏳📉",
+          rule: p => (p.patient||0) >= 3,
+          msg:"You’re cautious and timing-focused. With a strong search plan, you’ll avoid overpaying and move when it’s right."
+        },
+        {
+          name:"The Selective Buyer ✅🏡",
+          rule: p => (p.selective||0) >= 3,
+          msg:"You know what you want and won’t settle. The key is balancing must-haves with market reality."
+        },
+        {
+          name:"The Risk Taker 🎲🏚️➡️🏡",
+          rule: p => (p.risk||0) >= 3,
+          msg:"You’re adventurous, but real estate rewards smart risk. Add a budget + inspection gameplan and you’ll be unstoppable."
+        },
+        {
+          name:"The Balanced Buyer ⚖️🏡",
+          rule: _ => true,
+          msg:"You’ve got a little bit of everything: practical, open-minded, and ready to learn. That’s a great combo for winning in this market."
+        }
+      ]
+    };
+
+    // --- State ---
+    let step = 0;
+    let score = 0;
+    let answers = [];
+    let profilePoints = {};
+
+    const $ = (id) => document.getElementById(id);
+
+    const questionText = $("questionText");
+    const choicesEl = $("choices");
+    const scoreText = $("scoreText");
+    const stepText = $("stepText");
+    const totalText = $("totalText");
+    const bar = $("bar");
+    const statusText = $("statusText");
+    const tipBox = $("tipBox");
+    const restartBtn = $("restartBtn");
+    const copyBtn = $("copyBtn");
+    const toast = $("toast");
+    const shareLink = $("shareLink");
+
+    $("year").textContent = new Date().getFullYear();
+    totalText.textContent = GAME.questions.length;
+
+    function showToast(msg="Copied!") {
+      toast.textContent = msg;
+      toast.classList.add("show");
+      setTimeout(()=>toast.classList.remove("show"), 1200);
+    }
+
+    function clamp(n,min,max){ return Math.max(min, Math.min(max,n)); }
+
+    function render() {
+      scoreText.textContent = score;
+      stepText.textContent = step;
+      bar.style.width = `${(step / GAME.questions.length) * 100}%`;
+
+      if (step < GAME.questions.length) {
+        statusText.textContent = "Playing";
+        const item = GAME.questions[step];
+        questionText.textContent = item.q;
+        tipBox.textContent = item.tip;
+
+        choicesEl.innerHTML = "";
+        item.choices.forEach((c, idx) => {
+          const btn = document.createElement("button");
+          btn.className = "choice";
+          btn.type = "button";
+          btn.innerHTML = `
+            <div class="tag">${c.tag}</div>
+            <div>
+              <div style="font-weight:800">${c.t}</div>
+              <div class="desc">+${c.pts} points</div>
+            </div>
+          `;
+          btn.addEventListener("click", () => choose(idx));
+          choicesEl.appendChild(btn);
+        });
+      } else {
+        showResults();
+      }
+    }
+
+    function addProfilePoints(obj){
+      if(!obj) return;
+      for (const [k,v] of Object.entries(obj)) {
+        profilePoints[k] = (profilePoints[k] || 0) + v;
+      }
+    }
+
+    function choose(idx) {
+      const item = GAME.questions[step];
+      const c = item.choices[idx];
+
+      answers.push({ step, idx, pts: c.pts, text: c.t, tag: c.tag });
+      score += c.pts;
+      addProfilePoints(c.profile);
+
+      step += 1;
+      render();
+    }
+
+    function computeProfile() {
+      for (const p of GAME.profiles) {
+        if (p.rule(profilePoints)) return p;
+      }
+      return GAME.profiles[GAME.profiles.length - 1];
+    }
+
+    function showResults() {
+      statusText.textContent = "Finished";
+      const prof = computeProfile();
+
+      const grade =
+        score >= 85 ? "🔥 Homebuyer Pro" :
+        score >= 65 ? "✅ Ready-to-Buy" :
+        score >= 45 ? "👍 Getting There" : "🧩 Building Skills";
+
+      const resultText = `
+${grade} — Score: ${score}/${GAME.questions.reduce((a,q)=>a+Math.max(...q.choices.map(c=>c.pts)),0)}
+Profile: ${prof.name}
+
+${prof.msg}
+
+Want your personalized plan? Text/Call Shari Dickerson (eXp Realty): 954-204-5926
+      `.trim();
+
+      questionText.textContent = `🏁 Your Result: ${grade}`;
+      tipBox.innerHTML = `<strong>${prof.name}</strong><br>${prof.msg}<br><br><strong>Score:</strong> ${score}`;
+
+      choicesEl.innerHTML = `
+        <div class="card" style="padding:14px; border-radius: 16px;">
+          <div style="font-weight:900; font-size:16px; margin-bottom:6px;">Share your result:</div>
+          <div style="opacity:.95; line-height:1.5; font-size:13px; white-space:pre-wrap;">${escapeHtml(resultText)}</div>
+          <div class="actions" style="margin-top:12px;">
+            <button class="btn" id="copyNow">Copy Result</button>
+            <button class="btn secondary" id="playAgain">Play Again</button>
+          </div>
+          <div class="note" style="margin-top:10px;">
+            Post on Facebook: paste your result + add “Want yours? Play here:” + your game link.
+          </div>
+        </div>
+      `;
+
+      $("copyNow").addEventListener("click", async () => {
+        await copyText(resultText);
+      });
+      $("playAgain").addEventListener("click", reset);
+    }
+
+    function escapeHtml(str){
+      return str.replace(/[&<>"']/g, (m) => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+      }[m]));
+    }
+
+    async function copyText(text) {
+      try {
+        await navigator.clipboard.writeText(text);
+        showToast("Copied to clipboard!");
+      } catch {
+        // Fallback
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+        showToast("Copied!");
+      }
+    }
+
+    function reset() {
+      step = 0;
+      score = 0;
+      answers = [];
+      profilePoints = {};
+      render();
+      statusText.textContent = "Ready";
+    }
+
+    restartBtn.addEventListener("click", reset);
+
+    copyBtn.addEventListener("click", () => {
+      const prof = computeProfile();
+      const short = `I played Homebuyer Quest and got: ${prof.name} — Score ${score}. Want your result? Play the game! (Link)`;
+      copyText(short);
+    });
+
+    shareLink.addEventListener("click", (e) => {
+      e.preventDefault();
+      alert(
+        "To post on Facebook:\n\n1) Upload this file to a website host (Netlify/GitHub Pages/your site).\n2) Copy the public link.\n3) Post: “Play Homebuyer Quest! Comment your score 👇” + paste the link.\n\nWant me to help you host it? Tell me where (GitHub, Netlify, your website, etc.)."
+      );
+    });
+
+    // Start
+    render();
+  </script>
+</body>
+</html>
